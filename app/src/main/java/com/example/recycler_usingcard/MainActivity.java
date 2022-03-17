@@ -1,12 +1,16 @@
 package com.example.recycler_usingcard;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.WindowManager;
 
 import com.example.recycler_usingcard.Adapterclass.MyAdapter;
 import com.example.recycler_usingcard.Modelclass.Model;
@@ -21,21 +25,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rcv=findViewById(R.id.rc);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        rcv = findViewById(R.id.rcv);
+
+
+        //getSupportFragmentManager().beginTransaction().replace(R.id.fm,new dataFragment()).commit();
 
 //for vertical view -->
-        //rcv.setLayoutManager(new LinearLayoutManager(this));
+      //  rcv.setLayoutManager(new LinearLayoutManager(this));
        // adapter = new MyAdapter(dataqueqe()); --> send only arraylist not for clickonlistner
 
         // for add onClicklistner
         adapter = new MyAdapter(dataqueqe(),getApplicationContext());
 
         rcv.setAdapter(adapter);
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
 
-// for horizontal view -->
-        //LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        //rcv.setLayoutManager(linearLayoutManager);
+ //for horizontal view -->
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+//        rcv.setLayoutManager(linearLayoutManager);
 
 // for gridal layout
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
@@ -83,5 +91,30 @@ public class MainActivity extends AppCompatActivity {
         holder.add(ob6);
 
         return holder;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.mainicon,menu);
+        MenuItem item=menu.findItem(R.id.searh_menu);
+
+        SearchView searchView=(SearchView)item.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText)
+            {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 }

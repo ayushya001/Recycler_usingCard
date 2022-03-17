@@ -6,6 +6,8 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,15 +20,18 @@ import com.example.recycler_usingcard.MainActivity2;
 import com.example.recycler_usingcard.Modelclass.Model;
 import com.example.recycler_usingcard.R;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.zip.Inflater;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.myviewholder> {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.myviewholder> implements Filterable {
     ArrayList<Model> data;
+    ArrayList<Model> backup;
     Context context;
 
     public MyAdapter(ArrayList<Model> data,Context context) {
         this.data = data;
         this.context = context;
+        backup=new ArrayList<>(data);
     }
 
     @NonNull
@@ -57,11 +62,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.myviewholder> {
             }
         });
     }
-
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
     public class myviewholder extends RecyclerView.ViewHolder {
         ImageView img;
         TextView t1, t2;
@@ -75,4 +75,47 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.myviewholder> {
             c1 = (CardView) itemView.findViewById(R.id.cardView);
         }
     }
+
+    @Override
+    public int getItemCount() {
+        return data.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    Filter filter=new Filter() {
+        @Override
+        // background thread
+        protected FilterResults performFiltering(CharSequence keyword)
+        {
+            ArrayList<Model> filtereddata=new ArrayList<>();
+
+            if(keyword.toString().isEmpty())
+                filtereddata.addAll(backup);
+            else
+            {
+                for(Model obj : backup)
+                {
+                    if(obj.getHeader().toString().toLowerCase().contains(keyword.toString().toLowerCase()))
+                        filtereddata.add(obj);
+                }
+            }
+
+            FilterResults results=new FilterResults();
+            results.values=filtereddata;
+            return results;
+        }
+
+        @Override  // main UI thread
+        protected void publishResults(CharSequence constraint, FilterResults results)
+        {
+            data.clear();
+            data.addAll((ArrayList<Model>)results.values);
+            notifyDataSetChanged();
+        }
+    };
+
 }
